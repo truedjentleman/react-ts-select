@@ -17,6 +17,7 @@ export function Select({ value, options, onChange }: SelectProps) {
 
   return (
     <div
+      onBlur={() => setIsOpen(false)} // to hide list of options when the list out of focus
       onClick={() => setIsOpen((prev) => !prev)} // change the 'isOpen' state value to opposite - revert it
       tabIndex={0}
       className={styles.container}
