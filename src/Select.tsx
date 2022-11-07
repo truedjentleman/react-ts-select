@@ -1,9 +1,9 @@
 import styles from './select.module.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type SelectOption = {
   label: string
-  value: any
+  value: string | number
 }
 
 type SelectProps = {
@@ -14,6 +14,28 @@ type SelectProps = {
 
 export function Select({ value, options, onChange }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(0)
+
+  function clearOptions() {
+    onChange(undefined) // pass 'undefined' to onChange function
+  }
+
+  function selectOption(option: SelectOption) {
+    // call the onChange only if the other option is selected
+    if (option !== value) {
+      // console.log('onChange running') // DEBUG
+      onChange(option) // pass the 'option' to onChange function
+    }
+  }
+
+  function isOptionSelected(option: SelectOption) {
+    return option === value // if they are (current selected value and option in list) the same exact values - return 'true'
+  }
+
+  // * every single time we open the list  - reset highlight Index to 0
+  useEffect(() => {
+    if (isOpen) setHighlightedIndex(0)
+  }, [isOpen])
 
   return (
     <div
@@ -23,12 +45,32 @@ export function Select({ value, options, onChange }: SelectProps) {
       className={styles.container}
     >
       <span className={styles.value}>{value?.label}</span>
-      <button className={styles['clear-btn']}>&times;</button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation() // to prevent 'click' event propagation to parent div
+          clearOptions()
+        }}
+        className={styles['clear-btn']}
+      >
+        &times;
+      </button>
       <div className={styles.divider}></div>
       <div className={styles.caret}></div>
       <ul className={`${styles.options} ${isOpen ? styles.show : ''}`}>
-        {options.map((option) => (
-          <li key={option.label} className={styles.option}>
+        {options.map((option, index) => (
+          <li
+            onClick={(e) => {
+              e.stopPropagation() // prevent 'click' event propagation to parent div
+              selectOption(option)
+              setIsOpen(false) // close the list after selection
+            }}
+            onMouseEnter={() => setHighlightedIndex(index)} // highlight the options on mouse hover
+            key={option.value}
+            // add 'selected' class to option in list, which is currently selected
+            className={`${styles.option} ${
+              isOptionSelected(option) ? styles.selected : ''
+            } ${index === highlightedIndex ? styles.highlighted : ''}`}
+          >
             {option.label}
           </li>
         ))}
