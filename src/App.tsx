@@ -11,12 +11,17 @@ const options = [
 
 function App() {
   const [value, setValue] = useState<typeof options[0] | undefined>(options[0])
+  // console.log(value, 'app') // DEBUG
+
   return (
     <>
       <Select
         options={options}
         value={value}
-        onChange={(option) => setValue(option)}
+        onChange={(option) => {
+          // console.log(option, 'option selected')  //DEBUG
+          setValue(option) // set the 'value' state depending on user selection in Select component
+        }}
       />
     </>
   )
